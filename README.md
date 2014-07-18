@@ -1,4 +1,3 @@
-meteor-uploadcare
-=================
+# meteor-uploadcare
 
-Uploadcare.com client library packed for Meteor. Version 1.3.1
+1.3.1 Uploadcare library packed for Meteor. Uploadcare is a service that helps media creators, businesses and developers store, process and deliver visual content to their clients. Learn more on [uploadcare.com](uploadcare.com)
