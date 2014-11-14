@@ -66,14 +66,18 @@ Now you can save file `URL` and  `UUID`  to Database for further usage.
 Knowing image's original URL you can apply various <a href="https://uploadcare.com/documentation/cdn/#image-operations" target="_blank">image operations</a> on it such as resize, crop, blur, rotate, return progressive jpeg image,  set image quality and much more.
 
 _Examples of URL image operations:_
+
 http://www.ucarecdn.com/c5b7dd84-c0e2-48ff-babc-d23939f2c6b4/-/preview/480x480/-/quality/lightest/
+
 http://www.ucarecdn.com/9eaf4b7b-6688-43e9-a6e5-9690142d765a/-/preview/-/blur/10/
+
 http://www.ucarecdn.com/13448644-f240-4171-bad7-8e079eee491a/-/preview/-/grayscale/
+
 http://www.ucarecdn.com/ec8850a1-7d02-4af0-ad92-dbac0d169408/-/preview/-/quality/best/-/progressive/yes/
 
 ## Storing and Deleting files vie REST API
 
-Widget uploads files immediately after choosing to speed up users interaction with you app and makes UI async which allows user to do other stuff. This can be a real time saver.
+Widget uploads files immediately after user choosed them. It happens to speed up users interaction with you app and makes UI async which allows user to do other stuff. This can be a real time saver.
 
 By default uploaded __files will be available in Uploadcare storage for 24 hours__ from URL or UUID (via REST API). 
 
