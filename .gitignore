@@ -5,24 +5,4 @@ profile
 # webstorm noise
 .idea
 
-# sass noise
-.sass-cache
-
-# folders
-backend
-utils
-node_modules
-grunt/.grunt
-**/private
-
-
-*.zip
-*.pem
-*.ppk
-*.sh
-*.md
-*.swp
-*.log
-
-# .*
-.build*
+.build
