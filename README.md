@@ -99,8 +99,8 @@ Create `settings.json` file with
 ```json
 {
   "uploadcare": {
-	    "public_key": "xxx...",
-      "secret_key": ""yyy..."
+	"public_key": "xxx...",
+      	"secret_key": "yyy..."
   }
 }
 ```
@@ -123,12 +123,16 @@ meteor add http
 ```
 
 ### Store and Delete file server methods
+
 Client side call to server method:
+
 ```javascript
 Meteor.call('storeOnUplodcare', uuid, function(err, res) {});
 Meteor.call('deleteFromUploadcare', uuid, function(err, res) {});
 ```
-Server side method (place server methods code `/server/methods_server.js` directory):
+
+Server side method (place server methods code in your Meteor project directory here `meteor-app/server/methods_server.js`):
+
 ```javascript
 Future = Npm && Npm.require('fibers/future');
 
