@@ -1,60 +1,42 @@
 # meteor-uploadcare
 
-Uploadcare library packed for Meteor. 
+<a href="https://uploadcare.com" target="_blank">Uploadcare</a> library wrapped into Meteor package.
 
-Uploadcare is a service that helps media creators, businesses and developers store, process and deliver visual content to their clients. 
+_Uploadcare handles uploads, so you don’t have to!_
 
-Learn more on <a href="https://uploadcare.com" target="_blank">uploadcare.com</a>
+_Beautiful upload widget, API to manage files in cloud storage, smart and fast CDN to deliver them to your end users._
 
-*Library version: 1.3.1*
+_Crop, resize and transform uploaded images using URL commands._
 
-## How to use?
+__Real life Meteor app example:__
 
-### Install via Meteorite
+Look at beautiful Uploadcare <a href="https://vimeo.com/111023471" target="_blank">integration</a> in <a href="https://alpheratz.co" target="_blank"> Alpheratz</a> — personal gallery service on Meteor.
+
+## Install
 
 ```bash
-mrt add uploadcare
+meteor add maximdubrovin:uploadcare
 ```
 
-### Files uploading from client:
+## Start uploading right now:
 
-To upload files from client via [Javascript API](https://uploadcare.com/documentation/javascript_api/), [widget](https://uploadcare.com/documentation/widget/) or [REST Upload API](https://uploadcare.com/documentation/upload/) only required parameter is a *public key*.
-
-Place your public key in ```<head/>```
+Set your <a href="https://uploadcare.com/documentation/widget/#UPLOADCARE_PUBLIC_KEY" target="_blank">public key</a>. This can go to the `<head>` of your page:
 ```html
 <head>
   ...
   <script>
-      UPLOADCARE_PUBLIC_KEY = 'your_public_key';
+      UPLOADCARE_PUBLIC_KEY = 'demopublickey';
   </script>
   ...
 <head/>
 ```
 
-That's all! You are ready to upload files from client which way you like. It's a magic pill. 
+`demopublickey` will work for testing purpose.
 
-```<head/>``` is a monolith place to store your public key in dynamic Meteor applications.
+Place this file input somewhere in your templates:
 
-### Files and projects manipulating via REST API
-It's funny but you can do it without this package.
-
-For example, if you want to delete file from Uploadcare you are going to use REST API and you gonna do it via server method (for the sake of *secret key* privacy). 
-
-[Whatta hell is REST API?](#whatta-hell-is-rest-api)
-
-#### Set your secret key
-We gonna place it in dark room of ```Meteor.settings```. According to [docs](http://docs.meteor.com/#meteor_settings) «If the settings object contains a key named public, then Meteor.settings.public will be available on the client as well as the server. All other properties of Meteor.settings are only defined on the server.»
-
-Create ```settings.json``` in your meteor app directory.
-
-Add this chunk to it and fill keys according to your credentials:
-```javascript
-{
-	"uploadcare": {
-		"public_key": "blya",
-		"secret_key": "kto_pishet_open_source_readmy_v_5_utra?"
-	}
-}
+```html
+<input type="hidden" name="picture" role="uploadcare-uploader" />
 ```
 
 To run local Meteor app with this settings start like this:
@@ -62,51 +44,4 @@ To run local Meteor app with this settings start like this:
 meteor --config /path/to/settings.json
 ```
 
-On deploy case see [Meteor Up](https://github.com/arunoda/meteor-up#creating-a-meteor-up-project)
-
-For example, you can create server method to delete file from Uploadcare:
-```javascript
-if (Meteor.isServer) {
-  Meteor.methods({
-    deleteFileFromUploadcare: function(uuid) {
-      if (
-          uuid && typeof uuid === 'string' &&
-          Meteor.settings && typeof Meteor.settings === 'object' &&
-          Meteor.settings.uploadcare && typeof Meteor.settings.uploadcare === 'object' &&
-          Meteor.settings.uploadcare.public_key && typeof Meteor.settings.uploadcare.public_key === 'string' &&
-          Meteor.settings.uploadcare.secret_key && typeof Meteor.settings.uploadcare.secret_key === 'string' &&
-          HTTP) {
-          
-          HTTP.call(
-            'DELETE',
-              'https://api.uploadcare.com/files/' + uuid + '/',
-              {
-                  headers: {
-                      Accept: 'application/vnd.uploadcare-v0.3+json',
-                      Date: new Date().toJSON(),
-                      Authorization: 'Uploadcare.Simple ' + Meteor.settings.uploadcare.public_key + ':' + Meteor.settings.uploadcare.secret_key
-                  }
-              },
-              function(error, result) {
-              if (error) {
-            	  console.log('App Error: Deletion of a file from Uploadcare failed. Details:', error);
-              } else {
-                //console.log('Farewell file!');
-              }
-            });
-        }
-      }
-  })
-}
-```
-
-Info for code above: [uuid](https://uploadcare.com/documentation/javascript_api/#file), [HTTP package](http://docs.meteor.com/#http)
-
-#### Whatta hell is REST API?
-Link to page is a *request*. You click it — request goes to server by browser according to domain. Server reads link. It's like a newspapper for him. He reads ```blog.com/post/s23fs3```. If he understand it he sends a *response* back to your browser. In this case it will be ```some.html```. If he don't understand request he responds with some error codes like mystic ```404``` or ```503```. Maybe because he wants that we don't understand him too. Who knows.
-
-So by clicking a link we actually manipulate server.
-
-So if we want manipulate Uploadcare server from our code we need to construct our own request and send it to server. How to construct it? OK guy uses ```$.ajax```, Meteor girl may use built-in HTTP package.
-
-REST it is backbone of the web. It's beautiful.
+On deploy Meteor app with `settings.json` see notes at <a href="https://github.com/arunoda/meteor-up" target="_blank">Meteor Up</a>
