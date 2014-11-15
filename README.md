@@ -208,4 +208,30 @@ Place back-end code in the following directory of your Meteor project: `meteor-a
 
 I use `fibers/future` to get async callbacks on client.
 
-You may need to make sure that file identifier exists in your database before making API calls to store the file permanently.
+Since any UUID can be passed to `deleteFromUploadcare(uuid)` and `storeOnUplodcare(uuid)`, add checks in the back-end code which ensure that user stores/deletes files that belongs to him.
+
+_Example:_
+```javascript
+Meteor.methods({
+	userIsAlbumItemImageUUIDowner: function(uuid)
+	{
+		check(uuid, String);
+
+		return AlbumItems.find(
+			{
+				owner: this.userId,
+				uuid: uuid
+			}
+		).count();
+	},
+	storeOnUplodcare: function(uuid)
+	{
+		check(uuid, String);
+		
+		if (!Meteor.call('userIsAlbumItemImageUUIDowner', uuid))
+			return;
+		
+		...
+	}
+})
+```
