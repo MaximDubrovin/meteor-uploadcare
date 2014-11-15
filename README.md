@@ -90,7 +90,7 @@ Files __storing__ and __deleting__ you do via <a href="https://uploadcare.com/do
 Since REST API manipulations are crucial to your files it requires both your <a href="https://uploadcare.com/documentation/keys/" target="_blank">public and secret keys</a>.
 
 
-### Provide your private key to Meteor server code
+### Provide your secret and public keys to Meteor server code
 
 Easiest and _secure_ way to provide your secret key to Meteor server code is via <a href="http://docs.meteor.com/#/full/meteor_settings" target="_blank">Meteor.settings</a>
 
