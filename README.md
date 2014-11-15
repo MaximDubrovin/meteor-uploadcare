@@ -131,7 +131,7 @@ Meteor.call('storeOnUplodcare', uuid, function(err, res) {});
 Meteor.call('deleteFromUploadcare', uuid, function(err, res) {});
 ```
 
-Server side method (place server methods code in your Meteor project directory here `meteor-app/server/methods_server.js`):
+Server side method:
 
 ```javascript
 Future = Npm && Npm.require('fibers/future');
@@ -210,7 +210,9 @@ Meteor.methods({
 });
 ```
 
-_Note:_
+_Notes:_
+
+Place server methods code in your Meteor project directory here: `meteor-app/server/methods_server.js`, to no serve such code to client.
 
 I use `fibers/future` to get async callback on client.
 
