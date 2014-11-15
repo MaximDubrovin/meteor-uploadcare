@@ -87,20 +87,20 @@ Knowing file UUID after file upload you can decide to _store_ this file until yo
 
 Files __storing__ and __deleting__ you do via <a href="https://uploadcare.com/documentation/rest/" target="_blank">REST API</a> in your Meteor server side methods code.
 
-Since REST API manipulations are crucial to your files it requires both your <a href="https://uploadcare.com/documentation/keys/" target="_blank">public and secret keys</a>
+Since REST API manipulations are crucial to your files it requires both your <a href="https://uploadcare.com/documentation/keys/" target="_blank">public and secret keys</a>.
 
 
 ### Provide your private key to Meteor server code
 
-Easiest and _secure_ way to provide your private key to Meteor server code is via <a href="http://docs.meteor.com/#/full/meteor_settings" target="_blank">Meteor.settings</a>
+Easiest and _secure_ way to provide your secret key to Meteor server code is via <a href="http://docs.meteor.com/#/full/meteor_settings" target="_blank">Meteor.settings</a>
 
 Create `settings.json` file with
 
 ```json
 {
   "uploadcare": {
-	"public_key": "xxx...",
-      	"secret_key": "yyy..."
+  	"public_key": "xxx...",
+  	"secret_key": "yyy..."
   }
 }
 ```
@@ -110,7 +110,7 @@ To run local Meteor app with this settings start like this:
 meteor --config /path/to/settings.json
 ```
 
-On deploy Meteor app with `settings.json` see notes at <a href="https://github.com/arunoda/meteor-up" target="_blank">Meteor Up</a>
+On deploying Meteor app with `settings.json` see notes at <a href="https://github.com/arunoda/meteor-up" target="_blank">Meteor Up</a> tool.
 
 ### Add HTTP package
 
