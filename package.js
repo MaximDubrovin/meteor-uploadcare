@@ -12,7 +12,7 @@ Package.onUse(function(api) {
 });
 
 Package.onTest(function(api) {
-	api.use('tpaktop:uploadcare');
+	api.use('petsetgo:uploadcare');
 	api.use(['tinytest','coffeescript']);
-	api.addFiles('loader_tests.coffee', ['client']);
+	api.addFiles('tests/loader_tests.coffee', ['client']);
 });
