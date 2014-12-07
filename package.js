@@ -1,16 +1,18 @@
+Package.describe({
+	name: 'tpaktop:uploadcare',
+	summary: 'Wrapper around uploadcare for meteor. Inspired by filepicker-plus',
+	version: '1.0.0',
+	git: 'https://github.com/petsetgo/meteor-uploadcare.git'
+});
 
-Package.describe(
-	{
-		summary: "Uploadcare handles uploads, so you don’t have to.",
-		version: "1.4.5_1",
-		name: "maximdubrovin:uploadcare",
-		git: "https://github.com/MaximDubrovin/meteor-uploadcare.git"
-	}
-);
+Package.onUse(function(api) {
+	api.versionsFrom('1.0');
+	api.add_files([ "client/loader.js" ], ["client"]);
+	api.export('loadUploadcare', ['client'])
+});
 
-Package.on_use(function(api)
-	{
-		api.versionsFrom('0.9.0');
-		api.add_files([ "lib/uploadcare-1.4.5.min.js" ], ["client"]);
-	}
-);
+Package.onTest(function(api) {
+	api.use('tpaktop:uploadcare');
+	api.use(['tinytest','coffeescript']);
+	api.addFiles('loader_tests.coffee', ['client']);
+});
