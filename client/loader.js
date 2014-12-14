@@ -7,14 +7,14 @@ loadUploadcare = function () {
   var firstArg = [].shift.apply(arguments);
   if (typeof(firstArg) === "object") {
     config = _.extend(config, firstArg);
-    callback = [].pop.apply(arguments)
+    callback = [].pop.apply(arguments);
   }
   else if (typeof(firstArg) === "function") {
-    callback = firstArg
+    callback = firstArg;
   }
 
 
-  if (uploadcare === undefined) {
+  if (this.uploadcare === undefined) {
     var key = config.key;
     if (key) {
       // Functions to run after the script tag has loaded

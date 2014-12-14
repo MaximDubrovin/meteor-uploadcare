@@ -11,9 +11,9 @@ UploadcareSettings = {
   },
   authorization: function() {
     if(this.public_settings && this.private_settings) {
-      "Uploadcare.Simple " + public_settings.key + ":" + private_settings.uploadcare_secret_key
+      return "Uploadcare.Simple " + public_settings.key + ":" + private_settings.uploadcare_secret_key;
     } else {
-      ""
+      return "";
     }
   }
-}
+};
