@@ -2,6 +2,13 @@
 
 Uploadcare library wrapped into a Meteor package.
 
+This is a fork of [original library](https://github.com/MaximDubrovin/meteor-uploadcare) with following improvements:
+
+- On demand loading. Only load the client library on pages it is used.
+- Server side methods included with the package
+- Tests
+
+
 <a href="https://uploadcare.com" target="_blank">Uploadcare</a> handles uploads, so you don’t have to!
 Beautiful upload widget, API to manage files in cloud storage, smart and fast CDN to deliver them to your end users.
 Crop, resize and transform uploaded images using URL commands.
@@ -14,6 +21,25 @@ Look at the beautiful Uploadcare <a href="https://vimeo.com/111023471" target="_
 
 ```bash
 meteor add maximdubrovin:uploadcare
+```
+
+## On demand loading
+
+Load once for your whole application at startup or as needed from template created or rendered functions
+```
+loadUploadcare();
+//the key should be set in settings
+```
+
+You can call this over and over again.  It will detect if uploadcare has already been loaded, only loading the script when needed.
+
+## Iron Router Integration
+
+if you have specific routes that need to use uploadcare, you can load them for just these routes
+```
+Router.onBeforeAction(function(){
+  loadUploadcare();
+  },{only:['<ROUTE NAME>','<ROUTE NAME>']});
 ```
 
 ## Start uploading right now:
