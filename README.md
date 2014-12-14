@@ -20,7 +20,7 @@ Look at the beautiful Uploadcare <a href="https://vimeo.com/111023471" target="_
 ## Install
 
 ```bash
-meteor add maximdubrovin:uploadcare
+meteor add petsetgo:uploadcare
 ```
 
 ## On demand loading
