@@ -2,8 +2,7 @@ Future = Npm && Npm.require("fibers/future");
 
 UploadcareMethods =
 {
-  store: function (args) {
-    check(args.uuid, String);
+  _validateCall: function(args) {
     var defaults = {
       httpClient: HTTP,
       future: new Future()
@@ -13,10 +12,16 @@ UploadcareMethods =
     }
 
     if (args.checkPermissions() !== true) {
-      return;
+      return false;
     }
     _.extend(defaults, args);
-
+    return true;
+  },
+  store: function (args) {
+    check(args.uuid, String);
+    if(!this._validateCall(args)) {
+      return;
+    }
 
     uuid = args.uuid;
     httpClient = args.httpClient;
@@ -51,21 +56,29 @@ UploadcareMethods =
     return future.wait();
   },
 
-  delete: function (uuid) {
-    check(uuid, String);
+  delete: function (args) {
+    check(args.uuid, String);
+    if(!this._validateCall(args)) {
+      return;
+    }
 
-    this.unblock();
+    uuid = args.uuid;
+    httpClient = args.httpClient;
+    future = args.future;
 
-    var future = new Future();
+    // If running as part of meteor method
+    // indicate that waiting for this method to finish is not required
+    if(this.unblock)
+      this.unblock();
 
-    HTTP.call(
+    httpClient.call(
       "DELETE",
       "https://api.uploadcare.com/files/" + uuid + "/",
       {
         headers: {
           Accept: "application/vnd.uploadcare-v0.3+json",
           Date: new Date().toJSON(),
-          Authorization: "Uploadcare.Simple " + Meteor.settings.public.uploadcare.key + ":" + Meteor.settings.uploadcare.secret_key
+          Authorization: UploadcareSettings.authorization
         }
       },
       function (err) {
