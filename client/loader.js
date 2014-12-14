@@ -1,8 +1,8 @@
 loadUploadcare = function () {
   var config = {};
   var callback = _.noop;
-  if (Meteor.settings && Meteor.settings.public && Meteor.settings.public.uploadcare) {
-    config = Meteor.settings.public.uploadcare;
+  if (UploadcareSettings.public_settings) {
+    config = UploadcareSettings.public_settings;
   }
   var firstArg = [].shift.apply(arguments);
   if (typeof(firstArg) === "object") {
@@ -40,7 +40,7 @@ loadUploadcare = function () {
         script.onerror = uploadcareErrorCallback;
 
         // Load the script tag
-        document.getElementsByTagName('head')[0].appendChild(script);
+        document.getElementsByTagName("head")[0].appendChild(script);
 
       } else {
         if (console !== undefined) {
