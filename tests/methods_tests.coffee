@@ -1,75 +1,60 @@
 # storeOnUplodcare
-Tinytest.add "fails without check permission function", (test) ->
+@mockHTTP =
+  lastCall: {}
+  callbackArgs: undefined
+  call: (method, url, headers, callback)->
+    @lastCall.method = method
+    @lastCall.url = url
+    @lastCall.headers = headers
+
+    callback(@callbackArgs) if callback
+@subject = (args)->
+  UploadcareMethods.store
+    uuid: "uuid"
+    httpClient: @mockHTTP
+    future: _.extend({wait: ->},args.future)
+    checkPermissions: -> args.isPermitted
+
+Tinytest.add "throws an error without check permission function", (test) ->
   test.throws ->
-    UploadcareMethods.store(uuid: "123")
+    UploadcareMethods.store(uuid: "uuid")
   , (exception) ->
     test.equal(exception.error, 400)
     true
 
-Tinytest.addAsync "does not proceed when check permission returns non true", (test, done) ->
-  called = false
-  mockHTTP =
-    call: ->
-      called = true
+Tinytest.add "does not proceed when check permission fails", (test) ->
+  @subject(isPermitted: false)
 
-  UploadcareMethods.store
-    httpClient: mockHTTP
-    uuid: "123"
-    checkPermissions: -> undefined
-
-  Meteor.setTimeout ->
-    test.equal(called, false)
-    done()
-  , 500
+  test.equal(@mockHTTP.lastCall, {})
 
 Tinytest.add "calls http api with uuid if permission check passed", (test) ->
-  actualUrl = ""
-  mockHTTP =
-    call: (method, url, headers, callback)->
-      actualUrl = url
+  @subject
+   future:
+    return: ->
+   isPermitted: true
 
-
-  UploadcareMethods.store
-    uuid: "123"
-    httpClient: mockHTTP
-    future:
-      wait: ->
-    checkPermissions: -> true
-
-  test.equal(actualUrl, "https://api.uploadcare.com/files/123/storage/")
+  test.equal(@mockHTTP.lastCall.url, "https://api.uploadcare.com/files/uuid/storage/")
 
 Tinytest.add "returns true on success", (test) ->
-  mockHTTP =
-    call: (method, url, headers, callback)->
-      callback()
-
   futureResult = undefined
-  UploadcareMethods.store
-    uuid: "123"
-    httpClient: mockHTTP
-    future:
+  @subject
+   future:
       return: (err, result) -> futureResult = result
-      wait: ->
-    checkPermissions: -> true
+   isPermitted: true
 
   test.equal(futureResult, true)
 
 Tinytest.add "returns error on failure", (test) ->
-  mockHTTP =
-    call: (method, url, headers, callback)->
-      callback(error: true)
-
   futureResult = undefined
   actualErr = undefined
-  UploadcareMethods.store
-    uuid: "123"
-    httpClient: mockHTTP
-    future:
+  @mockHTTP.callbackArgs = error: true
+
+  @subject
+   future:
       return: (err, result) ->
         actualErr = err
         futureResult = result
-      wait: ->
-    checkPermissions: -> true
+   isPermitted: true
 
   test.equal(futureResult, null)
   test.equal(actualErr, error: true)
