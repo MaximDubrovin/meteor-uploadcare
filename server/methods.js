@@ -39,7 +39,7 @@ UploadcareMethods =
         headers: {
           Accept: "application/vnd.uploadcare-v0.3+json",
           Date: new Date().toJSON(),
-          Authorization: UploadcareSettings.authorization
+          Authorization: UploadcareSettings.authorization()
         }
       },
       function (err) {
@@ -78,7 +78,7 @@ UploadcareMethods =
         headers: {
           Accept: "application/vnd.uploadcare-v0.3+json",
           Date: new Date().toJSON(),
-          Authorization: UploadcareSettings.authorization
+          Authorization: UploadcareSettings.authorization()
         }
       },
       function (err) {

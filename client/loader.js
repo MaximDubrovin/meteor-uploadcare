@@ -1,8 +1,8 @@
 loadUploadcare = function () {
   var config = {};
   var callback = _.noop;
-  if (UploadcareSettings.public_settings) {
-    config = UploadcareSettings.public_settings;
+  if (UploadcareSettings.publicSettings()) {
+    config = UploadcareSettings.publicSettings();
   }
   var firstArg = [].shift.apply(arguments);
   if (typeof(firstArg) === "object") {
@@ -44,7 +44,7 @@ loadUploadcare = function () {
 
       } else {
         if (console !== undefined) {
-          console.log("uploadcare - tried to load but key not supplied");
+          console.log("uploadcare - tried to load but key (Meteor.settings.public.uploadcare.key) not supplied");
         }
       }
     }
