@@ -37,6 +37,13 @@ describe '#store', ->
 
     test.equal(@httpClient.lastCall, {})
 
+  it "passes uuid to checkPermissions", (test) ->
+    @beforeEach()
+    uuid = ""
+    UploadcareMethods.store(uuid: "uuid", checkPermissions: (args) -> uuid = args.uuid)
+
+    test.equal(uuid, "uuid")
+
   it "calls http api with uuid if permission check passed", (test) ->
     @beforeEach()
     @store
@@ -97,6 +104,14 @@ describe '#delete', ->
     @delete(isPermitted: false)
 
     test.equal(@httpClient.lastCall, {})
+
+  it "passes uuid to checkPermissions", (test) ->
+    @beforeEach()
+    uuid = ""
+    UploadcareMethods.delete(uuid: "uuid", checkPermissions: (args) -> uuid = args.uuid)
+
+    test.equal(uuid, "uuid")
+
 
   it "calls http api with uuid if permission check passed", (test) ->
     @beforeEach()

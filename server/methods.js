@@ -11,7 +11,7 @@ UploadcareMethods =
       throw new Meteor.Error(400, "checkPermissions function is not defined");
     }
 
-    if (args.checkPermissions() !== true) {
+    if (args.checkPermissions(_.pick(args, 'uuid')) !== true) {
       return false;
     }
     _.extend(defaults, args);
