@@ -1,4 +1,3 @@
-# storeOnUplodcare
 @mockHTTP =
   lastCall: {}
   callbackArgs: undefined
@@ -8,53 +7,56 @@
     @lastCall.headers = headers
 
     callback(@callbackArgs) if callback
-@subject = (args)->
-  UploadcareMethods.store
-    uuid: "uuid"
-    httpClient: @mockHTTP
-    future: _.extend({wait: ->},args.future)
-    checkPermissions: -> args.isPermitted
+# store
 
-Tinytest.add "throws an error without check permission function", (test) ->
-  test.throws ->
-    UploadcareMethods.store(uuid: "uuid")
-  , (exception) ->
-    test.equal(exception.error, 400)
-    true
+describe '#store', ->
+  @store = (args)->
+    UploadcareMethods.store
+      uuid: "uuid"
+      httpClient: @mockHTTP
+      future: _.extend({wait: ->},args.future)
+      checkPermissions: -> args.isPermitted
 
-Tinytest.add "does not proceed when check permission fails", (test) ->
-  @subject(isPermitted: false)
+  it "throws an error without check permission function", (test) ->
+    test.throws ->
+      UploadcareMethods.store(uuid: "uuid")
+    , (exception) ->
+      test.equal(exception.error, 400)
+      true
 
-  test.equal(@mockHTTP.lastCall, {})
+  it "does not proceed when check permission fails", (test) ->
+    @store(isPermitted: false)
 
-Tinytest.add "calls http api with uuid if permission check passed", (test) ->
-  @subject
-   future:
-    return: ->
-   isPermitted: true
+    test.equal(@mockHTTP.lastCall, {})
 
-  test.equal(@mockHTTP.lastCall.url, "https://api.uploadcare.com/files/uuid/storage/")
+  it "calls http api with uuid if permission check passed", (test) ->
+    @store
+     future:
+      return: ->
+     isPermitted: true
 
-Tinytest.add "returns true on success", (test) ->
-  futureResult = undefined
-  @subject
-   future:
-      return: (err, result) -> futureResult = result
-   isPermitted: true
+    test.equal(@mockHTTP.lastCall.url, "https://api.uploadcare.com/files/uuid/storage/")
 
-  test.equal(futureResult, true)
+  it "returns true on success", (test) ->
+    futureResult = undefined
+    @store
+     future:
+        return: (err, result) -> futureResult = result
+     isPermitted: true
 
-Tinytest.add "returns error on failure", (test) ->
-  futureResult = undefined
-  actualErr = undefined
-  @mockHTTP.callbackArgs = error: true
+    test.equal(futureResult, true)
 
-  @subject
-   future:
-      return: (err, result) ->
-        actualErr = err
-        futureResult = result
-   isPermitted: true
+  it "returns error on failure", (test) ->
+    futureResult = undefined
+    actualErr = undefined
+    @mockHTTP.callbackArgs = error: true
 
-  test.equal(futureResult, null)
-  test.equal(actualErr, error: true)
+    @store
+     future:
+        return: (err, result) ->
+          actualErr = err
+          futureResult = result
+     isPermitted: true
+
+    test.equal(futureResult, null)
+    test.equal(actualErr, error: true)
