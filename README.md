@@ -37,9 +37,9 @@ Place this `input` element somewhere in your templates:
 <input type="hidden" name="picture" role="uploadcare-uploader" data-crop />
 ```
 
-The library looks for an input with special `role` attribute, and places a widget there. 
+The library looks for an input with special `role` attribute, and places a widget there.
 
-As soon as the file is uploaded, this `input` will receive file UUID or CDN link. 
+As soon as the file is uploaded, this `input` will receive file UUID or CDN link.
 
 To get file URL and other info after upload is finished,
 you need to get the widget instance for a given input element.
@@ -78,7 +78,7 @@ http://www.ucarecdn.com/ec8850a1-7d02-4af0-ad92-dbac0d169408/-/preview/-/quality
 
 The widget starts uploading immediately after user chooses a file. It speeds up interaction with your app, and makes UI async, allowing users to do other stuff while the file is still uploading. This can be a real time saver.
 
-By default uploaded __files will be available in Uploadcare storage for 24 hours__ from URL or UUID (via REST API). 
+By default uploaded __files will be available in Uploadcare storage for 24 hours__ from URL or UUID (via REST API).
 
 Why? To prevent overwhelming your project with unneeded files, to avoid exceeding your plan limits, and to protect you from risk of abusing your public key by malicious users. You may __store__ each uploaded file permanently, or __delete__ it, using <a href="https://uploadcare.com/documentation/rest/" target="_blank">REST API</a> on your Meteor back-end.
 
@@ -119,101 +119,27 @@ meteor add http
 Client-side call to your back-end:
 
 ```javascript
-Meteor.call('storeOnUplodcare', uuid, function(err, res) {});
-Meteor.call('deleteFromUploadcare', uuid, function(err, res) {});
-```
-
-Server-side method:
-
-```javascript
-Future = Npm && Npm.require('fibers/future');
-
-Meteor.methods({
-	
-	storeOnUplodcare: function(uuid)
-	{
-		check(uuid, String);
-
-		this.unblock();
-
-		var future = new Future();
-
-		HTTP.call(
-			'PUT',
-			'https://api.uploadcare.com/files/' + uuid + '/storage/',
-			{
-				headers: {
-					Accept: 'application/vnd.uploadcare-v0.3+json',
-					Date: new Date().toJSON(),
-					Authorization: 'Uploadcare.Simple ' + Meteor.settings.uploadcare.public_key + ':' + Meteor.settings.uploadcare.secret_key
-				}
-			},
-			function(err)
-			{
-				if (err)
-				{
-					future.return(err, null)
-				}
-				else
-				{
-
-					future.return(null, true)
-				}
-			}
-		);
-
-		return future.wait();
-	},
-
-	deleteFromUploadcare: function(uuid)
-	{
-		check(uuid, String);
-
-		this.unblock();
-
-		var future = new Future();
-
-		HTTP.call(
-			'DELETE',
-			'https://api.uploadcare.com/files/' + uuid + '/',
-			{
-				headers: {
-					Accept: 'application/vnd.uploadcare-v0.3+json',
-					Date: new Date().toJSON(),
-					Authorization: 'Uploadcare.Simple ' + Meteor.settings.uploadcare.public_key + ':' + Meteor.settings.uploadcare.secret_key
-				}
-			},
-			function(err)
-			{
-				if (err)
-				{
-					future.return(err, null)
-				}
-				else
-				{
-					future.return(null, true)
-				}
-			}
-		);
-
-		return future.wait();
-	}
-
-});
+checkPermissions = function(args) {
+  # canAccess is an example of a custom method you need to check permissions
+  if(Meteor.call('canAccess', args.uuid)) {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+Meteor.call('Uploadcare.store', { uuid: uuid, checkPermissions: checkPermissions }, function(err, res) {});
+Meteor.call('Uploadcare.delete', { uuid: uuid, checkPermissions: checkPermissions }, function(err, res) {});
 ```
 
 _Notes:_
 
-Place back-end code in the following directory of your Meteor project: `meteor-app/server/methods_server.js`. It will prevent serving this code to client.
-
-I use `fibers/future` to get async callbacks on client.
-
-Since any UUID can be passed to `deleteFromUploadcare(uuid)` and `storeOnUplodcare(uuid)`, add checks in the back-end code which ensure that user stores/deletes files that belongs to him.
+`checkPermissions` function is required since any UUID can be passed to `Uploadcare.store` and `Uploadcare.delete`.
 
 _Example:_
 ```javascript
 Meteor.methods({
-	userIsAlbumItemImageUUIDowner: function(uuid)
+  canAccess: function(uuid)
 	{
 		check(uuid, String);
 
@@ -224,14 +150,5 @@ Meteor.methods({
 			}
 		).count();
 	},
-	storeOnUplodcare: function(uuid)
-	{
-		check(uuid, String);
-		
-		if (!Meteor.call('userIsAlbumItemImageUUIDowner', uuid))
-			return;
-		
-		...
-	}
 })
 ```
