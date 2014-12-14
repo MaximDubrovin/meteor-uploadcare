@@ -1,7 +1,7 @@
 Package.describe({
 	name: "petsetgo:uploadcare",
 	summary: "Wrapper around uploadcare for meteor. Inspired by filepicker-plus",
-	version: "1.0.0",
+	version: "1.0.1",
 	git: "https://github.com/petsetgo/meteor-uploadcare.git"
 });
 
