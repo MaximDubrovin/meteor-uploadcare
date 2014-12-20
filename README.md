@@ -8,7 +8,7 @@ Crop, resize and transform uploaded images using URL commands.
 
 __Real life Meteor app example:__
 
-Look at the beautiful Uploadcare <a href="https://vimeo.com/111023471" target="_blank">integration</a> in <a href="https://alpheratz.co" target="_blank"> Alpheratz</a> — personal gallery service on Meteor.
+Look at the beautiful Uploadcare <a href="https://www.youtube.com/watch?v=Op6mivR50p0" target="_blank">integration</a> in <a href="https://alpheratz.co" target="_blank"> Alpheratz</a> — personal gallery service on Meteor.
 
 ## Install
 
