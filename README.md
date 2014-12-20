@@ -1,112 +1,237 @@
 # meteor-uploadcare
 
-Uploadcare library packed for Meteor. 
+Uploadcare library wrapped into a Meteor package.
 
-Uploadcare is a service that helps media creators, businesses and developers store, process and deliver visual content to their clients. 
+<a href="https://uploadcare.com" target="_blank">Uploadcare</a> handles uploads, so you don’t have to!
+Beautiful upload widget, API to manage files in cloud storage, smart and fast CDN to deliver them to your end users.
+Crop, resize and transform uploaded images using URL commands.
 
-Learn more on <a href="https://uploadcare.com" target="_blank">uploadcare.com</a>
+__Real life Meteor app example:__
 
-*Library version: 1.3.1*
+Look at the beautiful Uploadcare <a href="https://www.youtube.com/watch?v=Op6mivR50p0" target="_blank">integration</a> in <a href="https://alpheratz.co" target="_blank"> Alpheratz</a> — personal gallery service on Meteor.
 
-## How to use?
-
-### Install via Meteorite
+## Install
 
 ```bash
-mrt add uploadcare
+meteor add maximdubrovin:uploadcare
 ```
 
-### Files uploading from client:
+## Start uploading right now:
 
-To upload files from client via [Javascript API](https://uploadcare.com/documentation/javascript_api/), [widget](https://uploadcare.com/documentation/widget/) or [REST Upload API](https://uploadcare.com/documentation/upload/) only required parameter is a *public key*.
-
-Place your public key in ```<head/>```
+Set your <a href="https://uploadcare.com/documentation/widget/#UPLOADCARE_PUBLIC_KEY" target="_blank">public key</a>. This can go to the `<head>` of your Meteor app:
 ```html
 <head>
   ...
   <script>
-      UPLOADCARE_PUBLIC_KEY = 'your_public_key';
+      UPLOADCARE_PUBLIC_KEY = 'demopublickey';
   </script>
   ...
 <head/>
 ```
 
-That's all! You are ready to upload files from client which way you like. It's a magic pill. 
+`demopublickey` will work for testing purpose.
 
-```<head/>``` is a monolith place to store your public key in dynamic Meteor applications.
+Place this `input` element somewhere in your templates:
 
-### Files and projects manipulating via REST API
-It's funny but you can do it without this package.
+```html
+<input type="hidden" name="picture" role="uploadcare-uploader" data-crop />
+```
 
-For example, if you want to delete file from Uploadcare you are going to use REST API and you gonna do it via server method (for the sake of *secret key* privacy). 
+The library looks for an input with special `role` attribute, and places a widget there. 
 
-[Whatta hell is REST API?](#whatta-hell-is-rest-api)
+As soon as the file is uploaded, this `input` will receive file UUID or CDN link. 
 
-#### Set your secret key
-We gonna place it in dark room of ```Meteor.settings```. According to [docs](http://docs.meteor.com/#meteor_settings) «If the settings object contains a key named public, then Meteor.settings.public will be available on the client as well as the server. All other properties of Meteor.settings are only defined on the server.»
+To get file URL and other info after upload is finished,
+you need to get the widget instance for a given input element.
 
-Create ```settings.json``` in your meteor app directory.
-
-Add this chunk to it and fill keys according to your credentials:
 ```javascript
+var widget = uploadcare.Widget('[role=uploadcare-uploader]');
+```
+
+And listen `widget.onUploadComplete()`
+
+```javascript
+widget.onUploadComplete(function(fileInfo) {
+  console.log('fileInfo,' fileInfo);
+  console.log('file UUID', fileInfo.uuid);
+  console.log('fileInfo.originalUrl', fileInfo.originalUrl); // Public CDN URL of the uploaded file, without any operations.
+});
+```
+
+Now you can save file `URL` and  `UUID`  to the database for further usage.
+
+## Image operations
+
+You can apply various <a href="https://uploadcare.com/documentation/cdn/#image-operations" target="_blank">image operations</a> on uploaded images, such as resize, crop, blur, rotate, return progressive jpeg image, set image quality and much more, by appending CDN commands on the original URL.
+
+_Examples of URL image operations:_
+
+http://www.ucarecdn.com/c5b7dd84-c0e2-48ff-babc-d23939f2c6b4/-/preview/480x480/-/quality/lightest/
+
+http://www.ucarecdn.com/9eaf4b7b-6688-43e9-a6e5-9690142d765a/-/preview/-/blur/10/
+
+http://www.ucarecdn.com/13448644-f240-4171-bad7-8e079eee491a/-/preview/-/grayscale/
+
+http://www.ucarecdn.com/ec8850a1-7d02-4af0-ad92-dbac0d169408/-/preview/-/quality/best/-/progressive/yes/
+
+## Storing and Deleting files via REST API
+
+The widget starts uploading immediately after user chooses a file. It speeds up interaction with your app, and makes UI async, allowing users to do other stuff while the file is still uploading. This can be a real time saver.
+
+By default uploaded __files will be available in Uploadcare storage for 24 hours__ from URL or UUID (via REST API). 
+
+Why? To prevent overwhelming your project with unneeded files, to avoid exceeding your plan limits, and to protect you from risk of abusing your public key by malicious users. You may __store__ each uploaded file permanently, or __delete__ it, using <a href="https://uploadcare.com/documentation/rest/" target="_blank">REST API</a> on your Meteor back-end.
+
+Since REST API manipulations must be secure, they require both your <a href="https://uploadcare.com/documentation/keys/" target="_blank">public and secret keys</a>.
+
+
+### Placing your secret and public keys into Meteor back-end code
+
+Easiest and the most _secure_ way to provide your Uploadcare keys to Meteor back-end code is placing them to <a href="http://docs.meteor.com/#/full/meteor_settings" target="_blank">Meteor.settings</a> by creating a `settings.json` file:
+
+```json
 {
-	"uploadcare": {
-		"public_key": "blya",
-		"secret_key": "kto_pishet_open_source_readmy_v_5_utra?"
-	}
+  "uploadcare": {
+  	"public_key": "xxx...",
+  	"secret_key": "yyy..."
+  }
 }
 ```
 
-To run local Meteor app with this settings start like this:
+Use the command to run local Meteor app with these settings:
+
 ```bash
 meteor --config /path/to/settings.json
 ```
 
-On deploy case see [Meteor Up](https://github.com/arunoda/meteor-up#creating-a-meteor-up-project)
+See notes on deploying Meteor app with `settings.json` at <a href="https://github.com/arunoda/meteor-up" target="_blank">Meteor Up</a> tool.
 
-For example, you can create server method to delete file from Uploadcare:
-```javascript
-if (Meteor.isServer) {
-  Meteor.methods({
-    deleteFileFromUploadcare: function(uuid) {
-      if (
-          uuid && typeof uuid === 'string' &&
-          Meteor.settings && typeof Meteor.settings === 'object' &&
-          Meteor.settings.uploadcare && typeof Meteor.settings.uploadcare === 'object' &&
-          Meteor.settings.uploadcare.public_key && typeof Meteor.settings.uploadcare.public_key === 'string' &&
-          Meteor.settings.uploadcare.secret_key && typeof Meteor.settings.uploadcare.secret_key === 'string' &&
-          HTTP) {
-          
-          HTTP.call(
-            'DELETE',
-              'https://api.uploadcare.com/files/' + uuid + '/',
-              {
-                  headers: {
-                      Accept: 'application/vnd.uploadcare-v0.3+json',
-                      Date: new Date().toJSON(),
-                      Authorization: 'Uploadcare.Simple ' + Meteor.settings.uploadcare.public_key + ':' + Meteor.settings.uploadcare.secret_key
-                  }
-              },
-              function(error, result) {
-              if (error) {
-            	  console.log('App Error: Deletion of a file from Uploadcare failed. Details:', error);
-              } else {
-                //console.log('Farewell file!');
-              }
-            });
-        }
-      }
-  })
-}
+### Add HTTP package
+
+To use Uploadcare REST API within Meteor back-end code, you have to make HTTP requests to Uplodacare infrastructure using <a href="http://docs.meteor.com/#/full/http" target="_blank">HTTP package</a>:
+
+```bash
+meteor add http
 ```
 
-Info for code above: [uuid](https://uploadcare.com/documentation/javascript_api/#file), [HTTP package](http://docs.meteor.com/#http)
+### Storing and Deleting files
 
-#### Whatta hell is REST API?
-Link to page is a *request*. You click it — request goes to server by browser according to domain. Server reads link. It's like a newspapper for him. He reads ```blog.com/post/s23fs3```. If he understand it he sends a *response* back to your browser. In this case it will be ```some.html```. If he don't understand request he responds with some error codes like mystic ```404``` or ```503```. Maybe because he wants that we don't understand him too. Who knows.
+Client-side call to your back-end:
 
-So by clicking a link we actually manipulate server.
+```javascript
+Meteor.call('storeOnUplodcare', uuid, function(err, res) {});
+Meteor.call('deleteFromUploadcare', uuid, function(err, res) {});
+```
 
-So if we want manipulate Uploadcare server from our code we need to construct our own request and send it to server. How to construct it? OK guy uses ```$.ajax```, Meteor girl may use built-in HTTP package.
+Server-side method:
 
-REST it is backbone of the web. It's beautiful.
+```javascript
+Future = Npm && Npm.require('fibers/future');
+
+Meteor.methods({
+	
+	storeOnUplodcare: function(uuid)
+	{
+		check(uuid, String);
+
+		this.unblock();
+
+		var future = new Future();
+
+		HTTP.call(
+			'PUT',
+			'https://api.uploadcare.com/files/' + uuid + '/storage/',
+			{
+				headers: {
+					Accept: 'application/vnd.uploadcare-v0.3+json',
+					Date: new Date().toJSON(),
+					Authorization: 'Uploadcare.Simple ' + Meteor.settings.uploadcare.public_key + ':' + Meteor.settings.uploadcare.secret_key
+				}
+			},
+			function(err)
+			{
+				if (err)
+				{
+					future.return(err, null)
+				}
+				else
+				{
+
+					future.return(null, true)
+				}
+			}
+		);
+
+		return future.wait();
+	},
+
+	deleteFromUploadcare: function(uuid)
+	{
+		check(uuid, String);
+
+		this.unblock();
+
+		var future = new Future();
+
+		HTTP.call(
+			'DELETE',
+			'https://api.uploadcare.com/files/' + uuid + '/',
+			{
+				headers: {
+					Accept: 'application/vnd.uploadcare-v0.3+json',
+					Date: new Date().toJSON(),
+					Authorization: 'Uploadcare.Simple ' + Meteor.settings.uploadcare.public_key + ':' + Meteor.settings.uploadcare.secret_key
+				}
+			},
+			function(err)
+			{
+				if (err)
+				{
+					future.return(err, null)
+				}
+				else
+				{
+					future.return(null, true)
+				}
+			}
+		);
+
+		return future.wait();
+	}
+
+});
+```
+
+_Notes:_
+
+Place back-end code in the following directory of your Meteor project: `meteor-app/server/methods_server.js`. It will prevent serving this code to client.
+
+I use `fibers/future` to get async callbacks on client.
+
+Since any UUID can be passed to `deleteFromUploadcare(uuid)` and `storeOnUplodcare(uuid)`, add checks in the back-end code which ensure that user stores/deletes files that belongs to him.
+
+_Example:_
+```javascript
+Meteor.methods({
+	userIsAlbumItemImageUUIDowner: function(uuid)
+	{
+		check(uuid, String);
+
+		return AlbumItems.find(
+			{
+				owner: this.userId,
+				uuid: uuid
+			}
+		).count();
+	},
+	storeOnUplodcare: function(uuid)
+	{
+		check(uuid, String);
+		
+		if (!Meteor.call('userIsAlbumItemImageUUIDowner', uuid))
+			return;
+		
+		...
+	}
+})
+```
